@@ -1,0 +1,62 @@
+{
+  "name": "licenta_react",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@builderx/utils": "0.1.6",
+    "@react-native-community/datetimepicker": "^6.1.1",
+    "@react-native-firebase/app": "^14.8.1",
+    "@react-native-firebase/auth": "^14.8.1",
+    "@react-native-firebase/storage": "^14.8.1",
+    "@react-native-picker/picker": "^2.4.0",
+    "@react-navigation/bottom-tabs": "^6.2.0",
+    "@react-navigation/native": "^6.0.8",
+    "@react-navigation/native-stack": "^6.5.2",
+    "base-64": "^1.0.0",
+    "expo-blur": "^11.0.0",
+    "firebase": "^8.2.3",
+    "lodash": "^4.17.21",
+    "patch-package": "^6.4.7",
+    "react": "17.0.2",
+    "react-native": "0.67.4",
+    "react-native-dynamic-search-bar": "^2.0.2",
+    "react-native-elements": "^3.4.2",
+    "react-native-flash-message": "^0.2.1",
+    "react-native-gifted-chat": "^0.16.3",
+    "react-native-image-picker": "^4.7.3",
+    "react-native-maps": "^0.30.1",
+    "react-native-paper": "^4.12.0",
+    "react-native-safe-area-context": "^4.2.2",
+    "react-native-screens": "^3.13.1",
+    "react-native-svg": "^12.3.0",
+    "react-navigation": "4.0.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.8",
+    "@babel/runtime": "^7.17.8",
+    "@react-native-community/eslint-config": "^3.0.1",
+    "@react-navigation/core": "^6.1.1",
+    "babel-jest": "^27.5.1",
+    "eslint": "^8.12.0",
+    "jest": "^27.5.1",
+    "metro-react-native-babel-preset": "^0.69.1",
+    "react-native-progress": "^5.0.0",
+    "react-native-vector-icons": "^9.1.0",
+    "react-test-renderer": "17.0.2"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./src/assets/fonts/"
+    ]
+  }
+}

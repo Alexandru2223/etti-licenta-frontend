@@ -1,0 +1,6 @@
+module Pods_licenta_react_licenta_reactTests {
+  umbrella header "Pods-licenta_react-licenta_reactTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
