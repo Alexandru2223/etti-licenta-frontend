@@ -17,6 +17,7 @@ import {Checkbox} from "react-native-paper";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import useColorScheme from "react-native/Libraries/Utilities/useColorScheme";
+import {CheckBox} from "react-native-elements";
 
 
 const RegisterScreen = () => {
@@ -25,6 +26,7 @@ const RegisterScreen = () => {
     const [password, setPassword] = useState('')
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
+    const [birthDate, setBirthDate] = useState('')
     const [isEnabled, setIsEnabled] = useState(false);
     const [checked, setChecked] = React.useState(false);
     const [chosenDate, setChosenDate] = useState(new Date(1950,1,1));
@@ -49,15 +51,19 @@ const RegisterScreen = () => {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-            username: email,
-            password: password
+            email: email,
+            password: password,
+            firstName: firstName,
+            lastName: lastName,
+            birthDate: birthDate,
+
         })
     };
 
     const postExample = async () => {
         try {
             await fetch(
-                'http://localhost:8080/register', requestOptions)
+                'http://localhost:8080/users/register', requestOptions)
                 .then(response => {
                     response.json()
                         .then(data => {
@@ -382,6 +388,19 @@ const RegisterScreen = () => {
                 : <View></View>
 
             }
+
+            <View style={styles.switchContainer}>
+                <View style={{flex: 1, left: 43}}>
+                <Text style={{color: 'blue', fontWeight: "bold"}}>Accept termenii GDPR </Text>
+                </View>
+                <View style={{flex: 1, right: 30}}>
+                    <CheckBox
+                        value={isEnabled}
+                        onValueChange={()=>{}}
+                        style={styles.checkbox}
+                    />
+                </View>
+            </View>
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={() => {

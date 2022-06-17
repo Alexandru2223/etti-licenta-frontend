@@ -2,13 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {auth} from "../firebase";
 import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAreaView";
 import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {SearchBar} from "react-native-elements";
 
-const ActiveJobs = ({navigation, route}) => {
+const FavoritesScreen = ({navigation, route}) => {
 
-    const [jobs, setJobs] = useState([]);
+    const [favorites, setFavorites] = useState([]);
     useEffect(() => {
-        getJobs().then(r => console.log(r));
+        getFavorites().then(r => console.log(r));
     }, [route])
 
     const requestOptions = {
@@ -18,14 +17,14 @@ const ActiveJobs = ({navigation, route}) => {
             'Content-Type': 'application/json'
         },
     };
-    const getJobs = async () => {
+    const getFavorites = async () => {
         try {
             fetch(
-                'http://localhost:8080/jobs/user/' + auth?.currentUser?.email, requestOptions)
+                'http://localhost:8080/favorites/saved/' + auth?.currentUser?.email, requestOptions)
                 .then(response => {
                     response.json()
                         .then(data => {
-                            setJobs(data);
+                            setFavorites(data);
                         });
                 })
         } catch (error) {
@@ -40,14 +39,14 @@ const ActiveJobs = ({navigation, route}) => {
             'Content-Type': 'application/json'
         },
     };
-    const deleteJob = async (id) => {
+    const deleteFavorite = async (id) => {
         try {
             fetch(
-                'http://localhost:8080/jobs/delete/' + auth?.currentUser?.email + '/' + id, requestOptionsDelete)
+                'http://localhost:8080/favorites/delete/saved?idJob=' + id + '&user=' + auth?.currentUser?.email, requestOptionsDelete)
                 .then(response => {
                     response.json()
                         .then(data => {
-                            setJobs(data);
+                            setFavorites(data);
                         });
                 })
         } catch (error) {
@@ -97,7 +96,7 @@ const ActiveJobs = ({navigation, route}) => {
             <SafeAreaView style={styles.container}>
                 <View style={styles.container}>
                     <FlatList
-                        data={jobs}
+                        data={favorites}
                         ItemSeparatorComponent={ItemSeparatorView}
                         keyExtriactor={(time, index) => index.toString()}
                         renderItem={({item}) => {
@@ -145,20 +144,7 @@ const ActiveJobs = ({navigation, route}) => {
                                                     </View>
                                                     <View style={{flex: 1, margin: 12, left: 40, flexDirection: "row"}}>
                                                         <TouchableOpacity
-                                                            onPress={() => navigation.navigate("EditJobScreen", {data: item})}
-                                                        >
-                                                            <Image
-                                                                source={require('/Users/sheep/Desktop/licenta_react/icons/editing.png')}
-                                                                resizeMethod='contain'
-                                                                style={{
-                                                                    right: 15,
-                                                                    width: 25,
-                                                                    height: 25,
-                                                                    tintColor: 'blue',
-                                                                }}/>
-                                                        </TouchableOpacity>
-                                                        <TouchableOpacity
-                                                            onPress={() => {deleteJob(item.id);}}
+                                                            onPress={() => {deleteFavorite(item.id);}}
                                                         >
                                                             <Image
                                                                 source={require('/Users/sheep/Desktop/licenta_react/icons/trash-can.png')}
@@ -210,7 +196,7 @@ const ActiveJobs = ({navigation, route}) => {
     )
 }
 
-export default ActiveJobs;
+export default FavoritesScreen;
 
 const styles = StyleSheet.create({
     container: {

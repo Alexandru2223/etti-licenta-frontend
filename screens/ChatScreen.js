@@ -16,13 +16,6 @@ const ChatScreen = () => {
     let room = "";
     const [time, setTime] = useState(Date.now());
 
-    /*useEffect(() => {
-        const interval = setInterval(() => setTime(Date.now()), 1000);
-        return () => {
-            clearInterval(interval);
-        };
-    }, []);*/
-
     const navigation = useNavigation();
     useEffect(() => {
         if (chats.length > 0){
@@ -34,12 +27,10 @@ const ChatScreen = () => {
                 if (documentSnapshot.data().email1 === auth?.currentUser?.email) {
                     updateChats(oldArray => [...oldArray, documentSnapshot.data().email2]);
                     updateRooms(oldArray => [...oldArray, documentSnapshot.data().room]);
-                    //updateChats1(oldArray => ({...oldArray, email: documentSnapshot.data().email2, room: documentSnapshot.data().room}));
                     getLastMessage(documentSnapshot.data().room, documentSnapshot.data().email2);
                 } else if (documentSnapshot.data().email2 === auth?.currentUser?.email) {
                     updateChats(oldArray => [...oldArray, documentSnapshot.data().email1]);
                     updateRooms(oldArray => [...oldArray, documentSnapshot.data().room]);
-                    //updateChats1(oldArray => [...oldArray, {email: documentSnapshot.data().email1, room: documentSnapshot.data().room}]);
                     getLastMessage(documentSnapshot.data().room, documentSnapshot.data().email2);
                 }
             });
@@ -57,24 +48,12 @@ const ChatScreen = () => {
         navigation.navigate("ChatView", {email: email, room: room});
     }
 
-    /*const checkRooms = (email) => {
-        email1 = email;
-        room = email + "$" + auth?.currentUser?.email;
-        db.collection(room).limit(1).get().then(snapshot => {
-            if (snapshot.size === 0) {
-                setFindChat(!findChat)
-            }
-        });
-        moveToChat(email, room);
-    }*/
-
     const getLastMessage = (item, email) => {
         db.collection(item).orderBy('createdAt', 'desc').limit(1).get().then((querySnapshot) => {
             querySnapshot.forEach(snapshot => {
                 let data = snapshot.data();
                 setMessages((message) => ({
                     ...message,
-                    // don't forget the brackets here
                     [email]: data.text + "$" + data.user._id,
                 }));
             })

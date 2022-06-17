@@ -24,6 +24,11 @@ import Chat from "./screens/Chat";
 import ChatScreen from "./screens/ChatScreen";
 import UploadAvatar from "./screens/UploadAvatar";
 import ActiveJobs from "./screens/ActiveJobs";
+import JobScreen from "./screens/JobScreen";
+import EditJobScreen from "./screens/EditJobScreen";
+import ReviewsScreen from "./screens/ReviewsScreen";
+import ReceivedReviewsScreen from "./screens/ReceivedReviewsScreen";
+import FavoritesScreen from "./screens/FavoritesScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +43,11 @@ const App = () => {
           <Stack.Screen options={{headerShown: false}} name="ChatView" component={Chat} />
           <Stack.Screen options={{headerShown: false}} name="Upload" component={UploadAvatar} />
           <Stack.Screen options={{headerShown: false}} name="ActiveJobs" component={ActiveJobs} />
+          <Stack.Screen options={{headerShown: false}} name="JobScreen" component={JobScreen} />
+          <Stack.Screen options={{headerShown: false}} name="EditJobScreen" component={EditJobScreen} />
+          <Stack.Screen options={{headerShown: false}} name="ReviewsScreen" component={ReviewsScreen} />
+          <Stack.Screen options={{headerShown: false}} name="ReceivedReviewsScreen" component={ReceivedReviewsScreen} />
+          <Stack.Screen options={{headerShown: false}} name="FavoritesScreen" component={FavoritesScreen} />
         </Stack.Navigator>
       </NavigationContainer>
   );

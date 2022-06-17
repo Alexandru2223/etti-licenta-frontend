@@ -2,13 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {auth} from "../firebase";
 import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAreaView";
 import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {SearchBar} from "react-native-elements";
 
-const ActiveJobs = ({navigation, route}) => {
+const ReviewsScreen = ({navigation, route}) => {
 
-    const [jobs, setJobs] = useState([]);
+    const [reviews, setReviews] = useState([]);
     useEffect(() => {
-        getJobs().then(r => console.log(r));
+        getReviews().then(r => console.log(r));
     }, [route])
 
     const requestOptions = {
@@ -18,14 +17,14 @@ const ActiveJobs = ({navigation, route}) => {
             'Content-Type': 'application/json'
         },
     };
-    const getJobs = async () => {
+    const getReviews = async () => {
         try {
             fetch(
-                'http://localhost:8080/jobs/user/' + auth?.currentUser?.email, requestOptions)
+                'http://localhost:8080/reviews/' + auth?.currentUser?.email, requestOptions)
                 .then(response => {
                     response.json()
                         .then(data => {
-                            setJobs(data);
+                            setReviews(data);
                         });
                 })
         } catch (error) {
@@ -40,14 +39,14 @@ const ActiveJobs = ({navigation, route}) => {
             'Content-Type': 'application/json'
         },
     };
-    const deleteJob = async (id) => {
+    const deleteReview = async (id) => {
         try {
             fetch(
-                'http://localhost:8080/jobs/delete/' + auth?.currentUser?.email + '/' + id, requestOptionsDelete)
+                'http://localhost:8080/review/' + auth?.currentUser?.email + '/' + id, requestOptionsDelete)
                 .then(response => {
                     response.json()
                         .then(data => {
-                            setJobs(data);
+                            setReviews(data);
                         });
                 })
         } catch (error) {
@@ -91,13 +90,13 @@ const ActiveJobs = ({navigation, route}) => {
                 </TouchableOpacity>
             </View>
             <View style={{left: 100}}>
-                <Text style={{fontSize: 30, fontWeight: 'bold'}}>Anunțuri active</Text>
+                <Text style={{fontSize: 30, fontWeight: 'bold'}}>Recenzii trimise</Text>
             </View>
             <View style={{height: 15}}></View>
             <SafeAreaView style={styles.container}>
                 <View style={styles.container}>
                     <FlatList
-                        data={jobs}
+                        data={reviews}
                         ItemSeparatorComponent={ItemSeparatorView}
                         keyExtriactor={(time, index) => index.toString()}
                         renderItem={({item}) => {
@@ -108,57 +107,45 @@ const ActiveJobs = ({navigation, route}) => {
                                     <View>
                                         <View style={{
                                             flex: 1,
-                                            flexDirection: 'row',
-                                            backgroundColor: 'white'
+                                            flexDirection: 'row'
                                         }}>
-                                            <View style={{backgroundColor: '#ffffff', flex: 0, margin: 5}}>
-                                                <Image
-                                                    style={{
-                                                        width: 100, height: 100, borderRadius: 100 / 2,
-                                                        overflow: "hidden",
-                                                        borderWidth: 1,
-                                                        borderColor: "#dadada"
-                                                    }}
-                                                    source={{uri: item.image1}}/>
-
-                                            </View>
                                             <View style={{backgroundColor: '#ffffff', flex: 1, margin: 0}}>
                                                 <View style={{
                                                     flex: 1,
                                                     flexDirection: 'row',
-                                                    backgroundColor: 'white'
+                                                    backgroundColor: "#cde5c3"
                                                 }}>
                                                     <View style={{flex: 2}}>
-                                                        {!!item.title && (
+                                                        {!!item.email && (
+                                                            <View style={{flexDirection: "row"}}>
+                                                                <Text
+                                                                    style={{
+                                                                        paddingVertical: 10,
+                                                                        fontSize: 18,
+                                                                        paddingStart: 5,
+                                                                        paddingEnd: 16,
+                                                                        color: 'black',
+                                                                        fontWeight: 'bold',
+                                                                    }}>
+                                                                    Utilizator:
+                                                                </Text>
                                                             <Text
                                                                 style={{
                                                                     paddingVertical: 10,
-                                                                    fontSize: 25,
-                                                                    paddingStart: 5,
+                                                                    fontSize: 18,
+                                                                    paddingStart: 0,
                                                                     paddingEnd: 16,
                                                                     color: 'green',
                                                                     fontWeight: 'bold',
                                                                 }}>
-                                                                {item.title}
+                                                                {item.email}
                                                             </Text>
+                                                            </View>
                                                         )}
                                                     </View>
                                                     <View style={{flex: 1, margin: 12, left: 40, flexDirection: "row"}}>
                                                         <TouchableOpacity
-                                                            onPress={() => navigation.navigate("EditJobScreen", {data: item})}
-                                                        >
-                                                            <Image
-                                                                source={require('/Users/sheep/Desktop/licenta_react/icons/editing.png')}
-                                                                resizeMethod='contain'
-                                                                style={{
-                                                                    right: 15,
-                                                                    width: 25,
-                                                                    height: 25,
-                                                                    tintColor: 'blue',
-                                                                }}/>
-                                                        </TouchableOpacity>
-                                                        <TouchableOpacity
-                                                            onPress={() => {deleteJob(item.id);}}
+                                                            onPress={() => {deleteReview(item.id);}}
                                                         >
                                                             <Image
                                                                 source={require('/Users/sheep/Desktop/licenta_react/icons/trash-can.png')}
@@ -171,7 +158,19 @@ const ActiveJobs = ({navigation, route}) => {
                                                         </TouchableOpacity>
                                                     </View>
                                                 </View>
-                                                {!!item.description && (
+                                                {!!item.message && (
+                                                    <View style={{flexDirection: "row", backgroundColor: "#cde5c3"}}>
+                                                        <Text
+                                                            style={{
+                                                                paddingVertical: 10,
+                                                                fontSize: 15,
+                                                                paddingStart: 5,
+                                                                paddingEnd: 16,
+                                                                color: 'black',
+                                                                fontWeight: "bold"
+                                                            }}>
+                                                            Mesaj:
+                                                        </Text>
                                                     <Text
                                                         style={{
                                                             paddingVertical: 10,
@@ -180,23 +179,37 @@ const ActiveJobs = ({navigation, route}) => {
                                                             paddingEnd: 16,
                                                             color: 'black'
                                                         }}>
-                                                        {item.description.length > 50 ? item.description.substring(0, 50) + '...' : item.description}
+                                                        {item.message.length > 50 ? item.message.substring(0, 50) + '...' : item.message}
                                                     </Text>
+                                                    </View>
                                                 )}
                                             </View>
                                         </View>
-                                        {!!item.price && (
+                                        {!!item.rating && (
+                                            <View style={{flexDirection: "row", backgroundColor: "#cde5c3"}}>
+                                                <Text
+                                                    style={{
+                                                        paddingVertical: 10,
+                                                        fontSize: 15,
+                                                        paddingStart: 5,
+                                                        paddingEnd: 16,
+                                                        color: 'black',
+                                                        fontWeight: "bold"
+                                                    }}>
+                                                    Scor:
+                                                </Text>
                                             <Text
                                                 style={{
-                                                    paddingVertical: 10,
+                                                    paddingVertical: 5,
                                                     fontSize: 15,
                                                     paddingStart: 5,
                                                     paddingEnd: 16,
                                                     color: 'black',
                                                     margin: 5
                                                 }}>
-                                                Pret: {item.price} RON
+                                                {item.rating}/5
                                             </Text>
+                                            </View>
                                         )}
 
                                     </View>
@@ -210,7 +223,7 @@ const ActiveJobs = ({navigation, route}) => {
     )
 }
 
-export default ActiveJobs;
+export default ReviewsScreen;
 
 const styles = StyleSheet.create({
     container: {

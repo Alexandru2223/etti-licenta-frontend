@@ -22,11 +22,11 @@ const LoginScreen = () => {
     const getToken = async () => {
         try {
             await fetch(
-                'http://localhost:8080/authenticate', requestOptions)
+                'http://localhost:8080/users/authenticate', requestOptions)
                 .then(response => {
                     response.text()
                         .then(data => {
-                            global.token = JSON.parse(data).jwttoken;
+                            global.token = JSON.parse(data).token;
                         });
                 })
         }

@@ -49,7 +49,10 @@ const Chat = ({route}) => {
 
     return (
         <>
-            <View style={{paddingTop: 50, left: 15}}>
+            <View style={{top: 50, left: 15, justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={{fontWeight: "bold",textAlign:"center", fontSize: 18}}>{email}</Text>
+            </View>
+            <View style={{paddingTop: 30, left: 15}}>
                 <TouchableOpacity onPress={navigateToChatScreen}>
                     <View>
                         <Image
@@ -59,7 +62,7 @@ const Chat = ({route}) => {
                                 width: 20,
                                 height: 20,
                                 tintColor: '#000000',
-                                top: 2
+                                top: 2,
                             }}/>
                     </View>
                 </TouchableOpacity>

@@ -6,6 +6,10 @@ import {auth, db} from '../firebase'
 const AccountScreen = ({navigation}) => {
 
     const [avatar, setAvatar] = useState(null);
+    const [count, setCount] = useState(null);
+    const [sendCount, setSendCount] = useState(null);
+    const [receivedCount, setReceivedCount] = useState(null);
+    const [favoritesCount, setFavoritesCount] = useState(null);
 
     useEffect(() => {
         db.collection('avatars').doc(auth?.currentUser?.email).get().then(documentSnapshot => {
@@ -13,6 +17,80 @@ const AccountScreen = ({navigation}) => {
                 setAvatar(documentSnapshot.data().url);
         })
     }, [avatar])
+
+    useEffect(() => {
+        getCountJobs().then(r => console.log(r));
+        getCountReceivedReviews().then(r => console.log(r));
+        getCountSentReviews().then(r => console.log(r));
+        getCountFavorites().then(r => console.log(r));
+    }, [])
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + global.token,
+            'Content-Type': 'application/json'
+        },
+    };
+
+    const getCountJobs = async () => {
+        try {
+            fetch(
+                'http://localhost:8080/jobs/user/count/' + auth?.currentUser?.email, requestOptions)
+                .then(response => {
+                    response.json()
+                        .then(data => {
+                            setCount(data);
+                        });
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getCountFavorites = async () => {
+        try {
+            fetch(
+                'http://localhost:8080/favorites/saved/count/' + auth?.currentUser?.email, requestOptions)
+                .then(response => {
+                    response.json()
+                        .then(data => {
+                            setFavoritesCount(data);
+                        });
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getCountSentReviews = async () => {
+        try {
+            fetch(
+                'http://localhost:8080/reviews/count/' + auth?.currentUser?.email, requestOptions)
+                .then(response => {
+                    response.json()
+                        .then(data => {
+                            setSendCount(data);
+                        });
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    const getCountReceivedReviews = async () => {
+        try {
+            fetch(
+                'http://localhost:8080/reviews/user/count/' + auth?.currentUser?.email, requestOptions)
+                .then(response => {
+                    response.json()
+                        .then(data => {
+                            setReceivedCount(data);
+                        });
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
 
     const handleSignOut = () => {
         auth
@@ -29,6 +107,16 @@ const AccountScreen = ({navigation}) => {
 
     const navigateToActiveJobs = () => {
         navigation.navigate("ActiveJobs")
+    }
+    const navigateToSendReviews = () => {
+        navigation.navigate("ReviewsScreen")
+    }
+
+    const navigateToReceivedReviews = () => {
+        navigation.navigate("ReceivedReviewsScreen")
+    }
+    const navigateToFavortiesScreen = () => {
+        navigation.navigate("FavoritesScreen")
     }
     const navigateToUploadPhoto = () => {
         navigation.navigate("Upload")
@@ -65,8 +153,9 @@ const AccountScreen = ({navigation}) => {
             <View style={{paddingTop: 50}}>
                 <TouchableOpacity onPress={navigateToActiveJobs} style={styles.button}>
                     <View style={styles.activeAnnouncement}>
-                        <View style={{width: '50%'}}>
+                        <View style={{width: '50%', flexDirection: "row"}}>
                             <Text style={{fontSize: 15}}>Anunturi active</Text>
+                            <Text style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{count}</Text>
                         </View>
                         <View style={{width: '50%', alignItems: "flex-end"}}>
                             <Image
@@ -85,10 +174,57 @@ const AccountScreen = ({navigation}) => {
 
             <View style={{height: 15}}></View>
             <View>
-                <TouchableOpacity onPress={() => console.log("hello12")} style={styles.button}>
+                <TouchableOpacity onPress={navigateToFavortiesScreen} style={styles.button}>
                     <View style={styles.activeAnnouncement}>
-                        <View style={{width: '50%'}}>
+                        <View style={{width: '50%', flexDirection:"row"}}>
+                            <Text style={{fontSize: 15}}>Anunturi salvate</Text>
+                            <Text style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{favoritesCount}</Text>
+                        </View>
+                        <View style={{width: '50%', alignItems: "flex-end"}}>
+                            <Image
+                                source={require('/Users/sheep/Desktop/licenta_react/icons/right-arrow.png')}
+                                resizeMethod='contain'
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    tintColor: '#000000',
+                                    top: 2
+                                }}/>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </View>
+
+            <View style={{height: 15}}></View>
+            <View>
+                <TouchableOpacity onPress={navigateToSendReviews} style={styles.button}>
+                    <View style={styles.activeAnnouncement}>
+                        <View style={{width: '50%', flexDirection:"row"}}>
+                            <Text style={{fontSize: 15}}>Recenzii trimise</Text>
+                            <Text style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{sendCount}</Text>
+                        </View>
+                        <View style={{width: '50%', alignItems: "flex-end"}}>
+                            <Image
+                                source={require('/Users/sheep/Desktop/licenta_react/icons/right-arrow.png')}
+                                resizeMethod='contain'
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    tintColor: '#000000',
+                                    top: 2
+                                }}/>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </View>
+
+            <View style={{height: 15}}></View>
+            <View>
+                <TouchableOpacity onPress={navigateToReceivedReviews} style={styles.button}>
+                    <View style={styles.activeAnnouncement}>
+                        <View style={{width: '50%', flexDirection: "row"}}>
                             <Text style={{fontSize: 15}}>Recenzii primite</Text>
+                            <Text style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{receivedCount}</Text>
                         </View>
                         <View style={{width: '50%', alignItems: "flex-end"}}>
                             <Image
@@ -127,6 +263,8 @@ const AccountScreen = ({navigation}) => {
                     </View>
                 </TouchableOpacity>
             </View>
+
+
 
 
             <View style={{height: 15}}></View>
