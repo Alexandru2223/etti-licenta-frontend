@@ -29,6 +29,7 @@ import EditJobScreen from "./screens/EditJobScreen";
 import ReviewsScreen from "./screens/ReviewsScreen";
 import ReceivedReviewsScreen from "./screens/ReceivedReviewsScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
+import EditUserScreen from "./screens/EditUserScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,7 @@ const App = () => {
           <Stack.Screen options={{headerShown: false}} name="ReviewsScreen" component={ReviewsScreen} />
           <Stack.Screen options={{headerShown: false}} name="ReceivedReviewsScreen" component={ReceivedReviewsScreen} />
           <Stack.Screen options={{headerShown: false}} name="FavoritesScreen" component={FavoritesScreen} />
+          <Stack.Screen options={{headerShown: false}} name="EditUserScreen" component={EditUserScreen} />
         </Stack.Navigator>
       </NavigationContainer>
   );

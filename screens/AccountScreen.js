@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Button, Text, View, Image, TouchableOpacity, ScrollView} from "react-native";
 import {auth, db} from '../firebase'
+import {useIsFocused} from "@react-navigation/core";
 
 
 const AccountScreen = ({navigation}) => {
@@ -10,20 +11,32 @@ const AccountScreen = ({navigation}) => {
     const [sendCount, setSendCount] = useState(null);
     const [receivedCount, setReceivedCount] = useState(null);
     const [favoritesCount, setFavoritesCount] = useState(null);
+    const [data, setData] = useState(null);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
-        db.collection('avatars').doc(auth?.currentUser?.email).get().then(documentSnapshot => {
-            if (documentSnapshot.data())
-                setAvatar(documentSnapshot.data().url);
-        })
-    }, [avatar])
+        if (isFocused) {
+            db.collection('avatars').doc(auth?.currentUser?.email).get().then(documentSnapshot => {
+                if (documentSnapshot.data())
+                    setAvatar(documentSnapshot.data().url);
+            })
+        }
+    }, [avatar, isFocused])
 
     useEffect(() => {
-        getCountJobs().then(r => console.log(r));
-        getCountReceivedReviews().then(r => console.log(r));
-        getCountSentReviews().then(r => console.log(r));
-        getCountFavorites().then(r => console.log(r));
-    }, [])
+        if (isFocused) {
+            getCountJobs().then(r => {
+            });
+            getCountReceivedReviews().then(r => {
+            });
+            getCountSentReviews().then(r => {
+            });
+            getCountFavorites().then(r => {
+            });
+            getUser().then(r => console.log(r));
+        }
+    }, [isFocused])
+
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -31,6 +44,21 @@ const AccountScreen = ({navigation}) => {
             'Content-Type': 'application/json'
         },
     };
+
+    const getUser = async () => {
+        try {
+            fetch(
+                'http://localhost:8080/users/' + auth?.currentUser?.email, requestOptions)
+                .then(response => {
+                    response.json()
+                        .then(data => {
+                            setData(data);
+                        });
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     const getCountJobs = async () => {
         try {
@@ -125,6 +153,20 @@ const AccountScreen = ({navigation}) => {
     return (
         <View style={styles.container}>
             <View style={styles.profileImageView}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("EditUserScreen", {data: data})}
+                    style={{left: 150, top: 25}}
+                >
+                    <Image
+                        source={require('/Users/sheep/Desktop/licenta_react/icons/editing.png')}
+                        resizeMethod='contain'
+                        style={{
+                            right: 15,
+                            width: 25,
+                            height: 25,
+                            tintColor: '#3bbb07',
+                        }}/>
+                </TouchableOpacity>
                 <TouchableOpacity onPress={navigateToUploadPhoto}>
                     {avatar ?
                         <Image
@@ -139,7 +181,9 @@ const AccountScreen = ({navigation}) => {
                     }
                 </TouchableOpacity>
                 <Text style={{color: '#3bbb07', fontWeight: 'bold'}}>{auth.currentUser?.email}</Text>
-                <Text style={{color: '#000000', fontWeight: 'bold'}}>077777777</Text>
+                {data ?
+                    <Text style={{color: '#000000', fontWeight: 'bold'}}>{data.phone}</Text> : <Text></Text>
+                }
             </View>
 
             <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 20}}>
@@ -176,9 +220,14 @@ const AccountScreen = ({navigation}) => {
             <View>
                 <TouchableOpacity onPress={navigateToFavortiesScreen} style={styles.button}>
                     <View style={styles.activeAnnouncement}>
-                        <View style={{width: '50%', flexDirection:"row"}}>
+                        <View style={{width: '50%', flexDirection: "row"}}>
                             <Text style={{fontSize: 15}}>Anunturi salvate</Text>
-                            <Text style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{favoritesCount}</Text>
+                            <Text style={{
+                                fontSize: 15,
+                                left: 250,
+                                fontWeight: "bold",
+                                color: 'black'
+                            }}>{favoritesCount}</Text>
                         </View>
                         <View style={{width: '50%', alignItems: "flex-end"}}>
                             <Image
@@ -199,9 +248,10 @@ const AccountScreen = ({navigation}) => {
             <View>
                 <TouchableOpacity onPress={navigateToSendReviews} style={styles.button}>
                     <View style={styles.activeAnnouncement}>
-                        <View style={{width: '50%', flexDirection:"row"}}>
+                        <View style={{width: '50%', flexDirection: "row"}}>
                             <Text style={{fontSize: 15}}>Recenzii trimise</Text>
-                            <Text style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{sendCount}</Text>
+                            <Text
+                                style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{sendCount}</Text>
                         </View>
                         <View style={{width: '50%', alignItems: "flex-end"}}>
                             <Image
@@ -224,7 +274,12 @@ const AccountScreen = ({navigation}) => {
                     <View style={styles.activeAnnouncement}>
                         <View style={{width: '50%', flexDirection: "row"}}>
                             <Text style={{fontSize: 15}}>Recenzii primite</Text>
-                            <Text style={{fontSize: 15, left: 250, fontWeight: "bold", color: 'black'}}>{receivedCount}</Text>
+                            <Text style={{
+                                fontSize: 15,
+                                left: 250,
+                                fontWeight: "bold",
+                                color: 'black'
+                            }}>{receivedCount}</Text>
                         </View>
                         <View style={{width: '50%', alignItems: "flex-end"}}>
                             <Image
@@ -241,13 +296,36 @@ const AccountScreen = ({navigation}) => {
                 </TouchableOpacity>
             </View>
 
-            <View style={{height: '20%'}}></View>
+            <View style={{height: '16%'}}></View>
+
+            <View style={{}}>
+                <TouchableOpacity onPress={() => console.log("hello")} style={styles.buttonDez}>
+                    <View style={styles.accountSettings}>
+                        <View style={{width: '50%'}}>
+                            <Text style={{fontSize: 15}}>Dezactivare cont</Text>
+                        </View>
+                        <View style={{width: '50%', alignItems: "flex-end"}}>
+                            <Image
+                                source={require('/Users/sheep/Desktop/licenta_react/icons/right-arrow.png')}
+                                resizeMethod='contain'
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    tintColor: '#000000',
+                                    top: 2
+                                }}/>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </View>
+
+            <View style={{height: 15}}></View>
 
             <View style={{}}>
                 <TouchableOpacity onPress={() => console.log("hello")} style={styles.button}>
                     <View style={styles.accountSettings}>
                         <View style={{width: '50%'}}>
-                            <Text style={{fontSize: 15}}>Setari</Text>
+                            <Text style={{fontSize: 15}}>Schimbare parola</Text>
                         </View>
                         <View style={{width: '50%', alignItems: "flex-end"}}>
                             <Image
@@ -263,8 +341,6 @@ const AccountScreen = ({navigation}) => {
                     </View>
                 </TouchableOpacity>
             </View>
-
-
 
 
             <View style={{height: 15}}></View>
@@ -312,10 +388,17 @@ const styles = StyleSheet.create({
     profileImageView: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 100
+        paddingTop: 50
     },
     button: {
         backgroundColor: '#3bbb07',
+        width: '100%',
+        padding: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    buttonDez: {
+        backgroundColor: 'red',
         width: '100%',
         padding: 10,
         borderRadius: 10,
