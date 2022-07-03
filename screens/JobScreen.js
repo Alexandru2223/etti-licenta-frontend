@@ -1,35 +1,70 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Button, Text, View, Image, TouchableOpacity, ScrollView} from "react-native";
 import {auth, db} from '../firebase'
+import {LogBox} from 'react-native';
+import {useNavigation} from "@react-navigation/native";
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 
-const AccountScreen = ({navigation, route}) => {
+const JobScreen = ({navigation, route}) => {
     const {data} = route.params;
 
-    /*const [data, setData] = useState([])
 
-    const requestOptions = {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + global.token,
-            'Content-Type': 'application/json'
-        },
-    };
+    const [chats, updateChats] = useState([]);
+    const [rooms, updateRooms] = useState(null);
+    let room = "";
 
-    const getJob = async (id) => {
-        try {
-            fetch(
-                'http://localhost:8080/jobs/id/' + id, requestOptions)
-                .then(response => {
-                    response.json()
-                        .then(data => {
-                            setData(data);
-                        });
-                })
-        } catch (error) {
-            console.error(error);
+    useEffect(() => {
+        if (chats.length > 0) {
+            updateChats([]);
         }
-    };*/
+        db.collection('rooms').get().then(querySnapshot => {
+            querySnapshot.forEach(documentSnapshot => {
+                if (documentSnapshot.data())
+                    if (documentSnapshot.data().email1 === auth?.currentUser?.email && documentSnapshot.data().email2 === data.userDTO.username.toLowerCase()) {
+                        updateRooms(documentSnapshot.data().room);
+                    } else if (documentSnapshot.data().email2 === auth?.currentUser?.email && documentSnapshot.data().email1 === data.userDTO.username.toLowerCase()) {
+                        updateRooms(documentSnapshot.data().room);
+                    }
+            });
+
+        });
+    }, []);
+
+    function generateRoom(length) {
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() *
+                charactersLength));
+        }
+        return result;
+    }
+
+    const moveToChat = (email) => {
+        if (rooms === null) {
+            const newRoom = generateRoom(8);
+            room = newRoom;
+            db.collection('rooms')
+                .add({
+                    email1: auth?.currentUser?.email.toLowerCase(),
+                    email2: email.toLowerCase(),
+                    room: room
+                })
+                .then(() => {
+                    console.log('User added!');
+                });
+            navigation.navigate("ChatView", {email: email, room: room});
+        } else {
+            navigation.navigate("ChatView", {email: email, room: rooms});
+        }
+    }
 
 
     function navigateToJobsScreen() {
@@ -81,7 +116,13 @@ const AccountScreen = ({navigation, route}) => {
                             left: 10
                         }}>{data.price + ' RON'}</Text>
                     </View>
-                    <View style={{backgroundColor: '#077a09', height: 40, borderRadius: 10, top: 10, flexDirection: "row"}}>
+                    <View style={{
+                        backgroundColor: '#077a09',
+                        height: 40,
+                        borderRadius: 10,
+                        top: 10,
+                        flexDirection: "row"
+                    }}>
                         <Text style={{
                             color: 'black',
                             fontSize: 15,
@@ -105,33 +146,67 @@ const AccountScreen = ({navigation, route}) => {
                             top: 10,
                             left: 10
                         }}>Descriere</Text>
-                        <Text style={{color: 'white', fontSize: 15, top: 15, left: 10, width: 400, fontWeight: "bold"}}>{data.description}</Text>
+                        <Text style={{
+                            color: 'white',
+                            fontSize: 15,
+                            top: 15,
+                            left: 10,
+                            width: 400,
+                            fontWeight: "bold"
+                        }}>{data.description}</Text>
                     </View>
                     <View style={{backgroundColor: '#077a09', height: 200, borderRadius: 10, top: 30}}>
                         <View style={{flexDirection: "row"}}>
-                        <Text style={{color: 'black', fontSize: 15, fontWeight: 'bold', top: 10, left: 10}}>Telefon
-                            : </Text>
+                            <Text style={{color: 'black', fontSize: 15, fontWeight: 'bold', top: 10, left: 10}}>Telefon
+                                : </Text>
                             <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold', top: 10, left: 10}}>
                                 {data.phone}</Text>
                         </View>
                         <View style={{flexDirection: "row"}}>
-                        <Text style={{color: 'black', fontSize: 15, fontWeight: 'bold', top: 20, left: 10}}>Locatie:</Text>
-                            <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold', top: 20, left: 10}}> {data.location}</Text>
+                            <Text style={{
+                                color: 'black',
+                                fontSize: 15,
+                                fontWeight: 'bold',
+                                top: 20,
+                                left: 10
+                            }}>Locatie:</Text>
+                            <Text style={{
+                                color: 'white',
+                                fontSize: 15,
+                                fontWeight: 'bold',
+                                top: 20,
+                                left: 10
+                            }}> {data.location}</Text>
                         </View>
                         <View style={{flexDirection: "row"}}>
-                        <Text style={{color: 'black', fontSize: 15, fontWeight: 'bold', top: 30, left: 10}}>Email:
-                        </Text>
-                            <Text style={{color: 'white', fontSize: 15, fontWeight: 'bold', top: 30, left: 10}}> {data.userDTO.username}</Text>
+                            <Text style={{color: 'black', fontSize: 15, fontWeight: 'bold', top: 30, left: 10}}>Email:
+                            </Text>
+                            <Text style={{
+                                color: 'white',
+                                fontSize: 15,
+                                fontWeight: 'bold',
+                                top: 30,
+                                left: 10
+                            }}> {data.userDTO.username}</Text>
                         </View>
                     </View>
                     <View style={{bottom: 40}}>
-                        <TouchableOpacity onPress={() => console.log(data.userDTO.username)}>
-                            <View style={{backgroundColor: '#13ef8b', height: 50, left: 5, width: 200, borderRadius: 5}}>
-                                <Text style={{top: 15, left: 45, fontWeight: "bold", fontSize: 15}}>Vezi recenziile</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate("UserReviews", {data: data})}>
+                            <View
+                                style={{backgroundColor: '#13ef8b', height: 50, left: 5, width: 200, borderRadius: 5}}>
+                                <Text style={{top: 15, left: 45, fontWeight: "bold", fontSize: 15}}>Vezi
+                                    recenziile</Text>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => console.log(data.userDTO.username)}>
-                            <View style={{backgroundColor: '#13efc7', height: 50, width: 200, bottom: 50, left: 220, borderRadius: 5}}>
+                        <TouchableOpacity onPress={() => moveToChat(data.userDTO.username)}>
+                            <View style={{
+                                backgroundColor: '#13efc7',
+                                height: 50,
+                                width: 200,
+                                bottom: 50,
+                                left: 220,
+                                borderRadius: 5
+                            }}>
                                 <Text style={{top: 15, left: 45, fontWeight: "bold", fontSize: 15}}>Trimite mesaj</Text>
                             </View>
                         </TouchableOpacity>
@@ -142,7 +217,7 @@ const AccountScreen = ({navigation, route}) => {
     )
 }
 
-export default AccountScreen;
+export default JobScreen;
 
 const styles = StyleSheet.create({
     container: {

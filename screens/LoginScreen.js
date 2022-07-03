@@ -3,6 +3,13 @@ import {Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpaci
 import {auth} from "../firebase";
 import {useNavigation} from "@react-navigation/native";
 import base64 from "base-64";
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 const LoginScreen = () => {
 

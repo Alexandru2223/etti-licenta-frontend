@@ -18,6 +18,13 @@ import {useNavigation} from "@react-navigation/native";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import Switch from "react-native/Libraries/Components/Switch/Switch";
 import {CheckBox} from "react-native-elements";
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 
 const EditUserScreen = ({navigation, route}) => {
@@ -39,7 +46,11 @@ const EditUserScreen = ({navigation, route}) => {
         navigation.navigate("Jobs")
     }
     const navigateToAccountScreen = () => {
-        navigation.navigate("Account", {'paramPropKey': 'paramPropValue'})
+        if (auth?.currentUser?.email === "admin@etti.com"){
+            navigation.navigate("AdminEditUsers", {'paramPropKey': 'paramPropValue'})
+        } else {
+            navigation.navigate("Account", {'paramPropKey': 'paramPropValue'})
+        }
     }
 
     const setDate = (event, date) => {

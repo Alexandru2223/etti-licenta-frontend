@@ -2,6 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {auth} from "../firebase";
 import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAreaView";
 import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 const ReceivedReviewsScreen = ({navigation, route}) => {
 

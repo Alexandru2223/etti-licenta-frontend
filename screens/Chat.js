@@ -4,15 +4,25 @@ import {GiftedChat} from "react-native-gifted-chat";
 import {auth, db} from '../firebase'
 import {useNavigation} from "@react-navigation/native";
 
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
+
 
 const Chat = ({route}) => {
 
-    const {email, room} = route.params;
+    let {email, room} = route.params;
     const [messages, setMessages] = useState([]);
     const navigation = useNavigation();
+    const [check ,setCheck] = useState(false);
 
-    useLayoutEffect(() => {
-        //let room = auth?.currentUser?.email + "$" + email;
+
+
+
+    useEffect(() => {
+
         const unsubscribe = db.collection(room).orderBy('createdAt', 'desc').onSnapshot(snapshot => setMessages((
             snapshot.docs.map(doc => ({
                 _id: doc.data()._id,
@@ -22,7 +32,10 @@ const Chat = ({route}) => {
             }))
         )))
         return unsubscribe;
+
     }, []);
+
+
 
     const navigateToChatScreen = () => {
         navigation.navigate("Chat");
@@ -50,7 +63,7 @@ const Chat = ({route}) => {
     return (
         <>
             <View style={{top: 50, left: 15, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontWeight: "bold",textAlign:"center", fontSize: 18}}>{email}</Text>
+                <Text style={{fontWeight: "bold", textAlign: "center", fontSize: 18}}>{email}</Text>
             </View>
             <View style={{paddingTop: 30, left: 15}}>
                 <TouchableOpacity onPress={navigateToChatScreen}>

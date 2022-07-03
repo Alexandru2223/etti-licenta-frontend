@@ -5,6 +5,14 @@ import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAre
 import Icon from "react-native-vector-icons/RNIMigration";
 import firebase from "firebase";
 import {auth, db} from '../firebase'
+import {useIsFocused} from "@react-navigation/core";
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 
 const JobsScreen = ({navigation}) => {
@@ -17,9 +25,14 @@ const JobsScreen = ({navigation}) => {
     const [abcClick, setAbcClick] = useState(false);
     const [favorites, setFavorites] = useState([]);
     const [data, setData] = useState([]);
+    const isFocused = useIsFocused();
 
-    let array = [];
-    //let currentColor = [];
+    useEffect(() => {
+        if (isFocused) {
+            getJobs('');
+            getFavoritesForUser();
+        }
+    }, [isFocused])
 
     const requestOptions = {
         method: 'GET',
@@ -151,7 +164,7 @@ const JobsScreen = ({navigation}) => {
         //console.log(data);
         favorites.forEach(f => {
             const find = data.find(d => d.id === f.jobId);
-            if(find.id) {
+            if(find?.id) {
                 currentColor[find.id] = "red";
             }
         });

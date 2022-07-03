@@ -16,6 +16,13 @@ import firebase from "firebase";
 import {auth, db} from '../firebase'
 import storage from "@react-native-firebase/storage";
 import * as Progress from 'react-native-progress';
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 const CreateJobScreen = ({navigation}) => {
 
@@ -550,6 +557,7 @@ const CreateJobScreen = ({navigation}) => {
                         margin: 5
                     }}/>
                 <TextInput
+                    autoCorrect={false}
                     placeholder="Titlu anunt"
                     style={styles.input}
                     onChangeText={text => setTitle(text)}
@@ -609,6 +617,7 @@ const CreateJobScreen = ({navigation}) => {
                         margin: 5
                     }}/>
                 <TextInput
+                    autoCorrect={false}
                     placeholder="Descriere"
                     multiline={true}
                     numberOfLines={4}
@@ -636,6 +645,7 @@ const CreateJobScreen = ({navigation}) => {
                         margin: 5
                     }}/>
                 <TextInput
+                    autoCorrect={false}
                     placeholder="Pret"
                     keyboardType='numeric'
                     style={styles.inputDescriere}
@@ -671,6 +681,7 @@ const CreateJobScreen = ({navigation}) => {
                         margin: 5
                     }}/>
                 <TextInput
+                    autoCorrect={false}
                     placeholder="Telefon"
                     keyboardType='numeric'
                     style={styles.inputDescriere}
@@ -697,6 +708,7 @@ const CreateJobScreen = ({navigation}) => {
                         margin: 5
                     }}/>
                 <TextInput
+                    autoCorrect={false}
                     placeholder="Email"
                     style={styles.inputDescriere}
                     value={auth.currentUser?.email}
@@ -723,6 +735,7 @@ const CreateJobScreen = ({navigation}) => {
                         margin: 5
                     }}/>
                 <TextInput
+                    autoCorrect={false}
                     placeholder="Adresa"
                     keyboardType='numeric'
                     style={styles.inputDescriere}

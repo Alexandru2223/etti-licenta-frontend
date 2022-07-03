@@ -14,6 +14,13 @@ import storage from '@react-native-firebase/storage';
 import * as Progress from 'react-native-progress';
 import {useNavigation} from "@react-navigation/native";
 import {auth, db} from "../firebase";
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 export default function UploadAvatar() {
     const [image, setImage] = useState(null);

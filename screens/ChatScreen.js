@@ -2,6 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {Button, Text, View, StyleSheet, TouchableOpacity, Keyboard, FlatList, Image} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 import {auth, db} from "../firebase";
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 
 const ChatScreen = () => {
@@ -15,27 +22,37 @@ const ChatScreen = () => {
     const [messages, setMessages] = useState({});
     let room = "";
     const [time, setTime] = useState(Date.now());
+    const [myMap, setMyMap] = useState(new Map());
 
     const navigation = useNavigation();
     useEffect(() => {
-        if (chats.length > 0){
+        if (chats.length > 0) {
             updateChats([]);
         }
         db.collection('rooms').get().then(querySnapshot => {
             querySnapshot.forEach(documentSnapshot => {
                 if (documentSnapshot.data())
-                if (documentSnapshot.data().email1 === auth?.currentUser?.email) {
-                    updateChats(oldArray => [...oldArray, documentSnapshot.data().email2]);
-                    updateRooms(oldArray => [...oldArray, documentSnapshot.data().room]);
-                    getLastMessage(documentSnapshot.data().room, documentSnapshot.data().email2);
-                } else if (documentSnapshot.data().email2 === auth?.currentUser?.email) {
-                    updateChats(oldArray => [...oldArray, documentSnapshot.data().email1]);
-                    updateRooms(oldArray => [...oldArray, documentSnapshot.data().room]);
-                    getLastMessage(documentSnapshot.data().room, documentSnapshot.data().email2);
-                }
+                    if (documentSnapshot.data().email1 === auth?.currentUser?.email) {
+                        updateChats(oldArray => [...oldArray, documentSnapshot.data().email2]);
+                        updateRooms(oldArray => [...oldArray, documentSnapshot.data().room]);
+                        getLastMessage(documentSnapshot.data().room, documentSnapshot.data().email2);
+                    } else if (documentSnapshot.data().email2 === auth?.currentUser?.email) {
+                        updateChats(oldArray => [...oldArray, documentSnapshot.data().email1]);
+                        updateRooms(oldArray => [...oldArray, documentSnapshot.data().room]);
+                        getLastMessage(documentSnapshot.data().room, documentSnapshot.data().email2);
+                    }
             });
         });
+        getAvatars();
     }, []);
+
+    const getAvatars = () => {
+        db.collection('avatars').get().then((querySnapshot) => {
+            querySnapshot.forEach(documentSnapshot => {
+                setMyMap(myMap.set(documentSnapshot.id, documentSnapshot.data().url));
+            })
+        });
+    }
 
     const moveToChat = (email) => {
         console.log("Move to chat")
@@ -96,7 +113,7 @@ const ChatScreen = () => {
                                 <View style={styles.chat}>
                                     <View style={styles.rowContainer}>
                                         <Image
-                                            source={require('/Users/sheep/Desktop/licenta_react/icons/photo.png')}
+                                            source={{uri: myMap.get(item)}}
                                             resizeMethod='contain'
                                             style={{
                                                 width: 60,
@@ -109,9 +126,15 @@ const ChatScreen = () => {
                                             <Text style={{fontSize: 18}}>{item}</Text>
                                             {
                                                 check(item) ?
-                                                    <Text style={{top: 5, color: 'blue'}}>{messages[item] != undefined ? messages[item].split("$")[0] : 1}</Text>
+                                                    <Text style={{
+                                                        top: 5,
+                                                        color: 'blue'
+                                                    }}>{messages[item] != undefined ? messages[item].split("$")[0] : ''}</Text>
                                                     :
-                                                    <Text style={{top: 5, color: 'blue'}}>Tu: {messages[item] != undefined ? messages[item].split("$")[0] :1}</Text>
+                                                    <Text style={{
+                                                        top: 5,
+                                                        color: 'blue'
+                                                    }}>Tu: {messages[item] !== undefined ? messages[item].split("$")[0] : 'Scrieti un mesaj'}</Text>
                                             }
                                         </View>
                                     </View>

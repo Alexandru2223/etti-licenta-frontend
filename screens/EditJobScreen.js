@@ -2,6 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, Button, Text, View, Image, TouchableOpacity, ScrollView, TextInput, Alert} from "react-native";
 import {auth, db} from '../firebase'
 import {Picker} from "@react-native-picker/picker";
+import { LogBox } from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs(['Warning: ...']);
+
+//Ignore all log notifications
+LogBox.ignoreAllLogs();
 
 
 const EditJobScreen = ({navigation, route}) => {

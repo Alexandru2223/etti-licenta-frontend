@@ -3,6 +3,7 @@ import {auth} from "../firebase";
 import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAreaView";
 import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import { LogBox } from 'react-native';
+import {useIsFocused} from "@react-navigation/core";
 
 // Ignore log notification by message
 LogBox.ignoreLogs(['Warning: ...']);
@@ -10,12 +11,18 @@ LogBox.ignoreLogs(['Warning: ...']);
 //Ignore all log notifications
 LogBox.ignoreAllLogs();
 
-const ReviewsScreen = ({navigation, route}) => {
+const UserReviews = ({navigation, route}) => {
+    const {data} = route.params;
+    const [grade, setGrade] = useState([]);
+    const isFocused = useIsFocused();
 
     const [reviews, setReviews] = useState([]);
+
     useEffect(() => {
-        getReviews().then(r => console.log(r));
-    }, [route])
+        if (isFocused) {
+            getReviews().then(r => console.log(r));
+        }
+    }, [isFocused])
 
     const requestOptions = {
         method: 'GET',
@@ -27,11 +34,18 @@ const ReviewsScreen = ({navigation, route}) => {
     const getReviews = async () => {
         try {
             fetch(
-                'http://localhost:8080/reviews/' + auth?.currentUser?.email, requestOptions)
+                'http://localhost:8080/reviews/user/' + data.userDTO.username, requestOptions)
                 .then(response => {
                     response.json()
                         .then(data => {
                             setReviews(data);
+                            let value = 0;
+                            data.forEach(review => {
+                                value = value + review.rating
+                            })
+                            for (let i=0; i< value/data.length; i++){
+                                setGrade(oldArray => [...oldArray, i]);
+                            }
                         });
                 })
         } catch (error) {
@@ -49,7 +63,7 @@ const ReviewsScreen = ({navigation, route}) => {
     const deleteReview = async (id) => {
         try {
             fetch(
-                'http://localhost:8080/review/' + auth?.currentUser?.email + '/' + id, requestOptionsDelete)
+                'http://localhost:8080/review/user/' + auth?.currentUser?.email + '/' + id, requestOptionsDelete)
                 .then(response => {
                     response.json()
                         .then(data => {
@@ -75,15 +89,23 @@ const ReviewsScreen = ({navigation, route}) => {
         );
     };
 
-    const navigateToAccountScreen = () => {
-        navigation.navigate("Account")
-    }
+    const ItemSeparatorViewStars = () => {
+        return (
+            // Flat List Item Separator
+            <View
+                style={{
+                    width: '100%',
+                }}
+            />
+        );
+    };
+
+
 
     return (
         <>
-            <View style={{paddingTop: 25}}></View>
             <View style={{paddingTop: 50, left: 15}}>
-                <TouchableOpacity onPress={navigateToAccountScreen}>
+                <TouchableOpacity onPress={() => navigation.navigate("JobScreen", {data: data})}>
                     <View>
                         <Image
                             source={require('/Users/sheep/Desktop/licenta_react/icons/back-arrow.png')}
@@ -97,8 +119,9 @@ const ReviewsScreen = ({navigation, route}) => {
                     </View>
                 </TouchableOpacity>
             </View>
-            <View style={{left: 100}}>
-                <Text style={{fontSize: 30, fontWeight: 'bold'}}>Recenzii trimise</Text>
+            <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={{fontSize: 20, fontWeight: 'bold'}}>Recenzii </Text>
+                <Text style={{fontSize: 20, fontWeight: 'bold', color: 'green'}}>{data.userDTO.username}</Text>
             </View>
             <View style={{height: 15}}></View>
             <SafeAreaView style={styles.container}>
@@ -124,7 +147,7 @@ const ReviewsScreen = ({navigation, route}) => {
                                                     backgroundColor: "#cde5c3"
                                                 }}>
                                                     <View style={{flex: 2}}>
-                                                        {!!item.senderEmail && (
+                                                        {!!item.email && (
                                                             <View style={{flexDirection: "row"}}>
                                                                 <Text
                                                                     style={{
@@ -137,33 +160,19 @@ const ReviewsScreen = ({navigation, route}) => {
                                                                     }}>
                                                                     Utilizator:
                                                                 </Text>
-                                                            <Text
-                                                                style={{
-                                                                    paddingVertical: 10,
-                                                                    fontSize: 18,
-                                                                    paddingStart: 0,
-                                                                    paddingEnd: 16,
-                                                                    color: 'green',
-                                                                    fontWeight: 'bold',
-                                                                }}>
-                                                                {item.senderEmal}
-                                                            </Text>
+                                                                <Text
+                                                                    style={{
+                                                                        paddingVertical: 10,
+                                                                        fontSize: 18,
+                                                                        paddingStart: 0,
+                                                                        paddingEnd: 16,
+                                                                        color: 'green',
+                                                                        fontWeight: 'bold',
+                                                                    }}>
+                                                                    {item.senderEmail}
+                                                                </Text>
                                                             </View>
                                                         )}
-                                                    </View>
-                                                    <View style={{flex: 1, margin: 12, left: 40, flexDirection: "row"}}>
-                                                        <TouchableOpacity
-                                                            onPress={() => {deleteReview(item.id);}}
-                                                        >
-                                                            <Image
-                                                                source={require('/Users/sheep/Desktop/licenta_react/icons/trash-can.png')}
-                                                                resizeMethod='contain'
-                                                                style={{
-                                                                    width: 25,
-                                                                    height: 25,
-                                                                    tintColor: 'red',
-                                                                }}/>
-                                                        </TouchableOpacity>
                                                     </View>
                                                 </View>
                                                 {!!item.message && (
@@ -179,16 +188,16 @@ const ReviewsScreen = ({navigation, route}) => {
                                                             }}>
                                                             Mesaj:
                                                         </Text>
-                                                    <Text
-                                                        style={{
-                                                            paddingVertical: 10,
-                                                            fontSize: 15,
-                                                            paddingStart: 5,
-                                                            paddingEnd: 16,
-                                                            color: 'black'
-                                                        }}>
-                                                        {item.message.length > 50 ? item.message.substring(0, 50) + '...' : item.message}
-                                                    </Text>
+                                                        <Text
+                                                            style={{
+                                                                paddingVertical: 10,
+                                                                fontSize: 15,
+                                                                paddingStart: 5,
+                                                                paddingEnd: 16,
+                                                                color: 'black'
+                                                            }}>
+                                                            {item.message.length > 50 ? item.message.substring(0, 50) + '...' : item.message}
+                                                        </Text>
                                                     </View>
                                                 )}
                                             </View>
@@ -206,17 +215,17 @@ const ReviewsScreen = ({navigation, route}) => {
                                                     }}>
                                                     Scor:
                                                 </Text>
-                                            <Text
-                                                style={{
-                                                    paddingVertical: 5,
-                                                    fontSize: 15,
-                                                    paddingStart: 5,
-                                                    paddingEnd: 16,
-                                                    color: 'black',
-                                                    margin: 5
-                                                }}>
-                                                {item.rating}/5
-                                            </Text>
+                                                <Text
+                                                    style={{
+                                                        paddingVertical: 5,
+                                                        fontSize: 15,
+                                                        paddingStart: 5,
+                                                        paddingEnd: 16,
+                                                        color: 'black',
+                                                        margin: 5
+                                                    }}>
+                                                    {item.rating}/5
+                                                </Text>
                                             </View>
                                         )}
 
@@ -231,7 +240,7 @@ const ReviewsScreen = ({navigation, route}) => {
     )
 }
 
-export default ReviewsScreen;
+export default UserReviews;
 
 const styles = StyleSheet.create({
     container: {
